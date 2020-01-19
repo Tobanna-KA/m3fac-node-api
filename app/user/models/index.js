@@ -1,5 +1,5 @@
 let mongoose = require('mongoose'),
-    b_crypt = require('bcrypt');
+    b_crypt = require('bcryptjs');
 
 let UserSchema = new mongoose.Schema({
     email: {
