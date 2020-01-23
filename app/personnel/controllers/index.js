@@ -14,34 +14,32 @@ module.exports.personnel = {
      * @returns {Promise<void>}
      * @constructor
      */
-    NEW_PERSONNEL: async (req, res) => {
+    NEW_PERSON: async (req, res) => {
         //check that required fields are completed
         if (req.body.email && req.body.first_name && req.body.last_name && req.body.identification && req.body.type) {
             req.body.return_det = true;
             await UserController.NEW_USER(req, res, async (user) => {
-                let token = null;
-                let reset_token = await new TokenGenerator().generate();
-                Personnel.create({personal_det: user._id, type: req.body.type}, {new: true}, (err, personnel) => {
-                    if(err) {
-                        //delete user if unable to create personnel
-                        UserDB.findByIdAndDelete(user._id, {}, () => {
-                            return res.status(200).send({
-                                auth: true,
-                                token: null,
-                                error: {message: 'Something went wrong'},
-                                ok: false
-                            });
-                        })
-                    } else {
-                        jwt.signToken({ id: user._id, level: user.level }, (result) => {
-                            token = result;
-                            user.password = null;
-                            Mail.newUserMail({email: req.body.email, token: reset_token}, (sent) => {
-                                res.status(200).send({ auth: true, token, user, message: 'Success', ok: true});
-                            })
+                let person = await Personnel.create({personal_det: user._id, type: req.body.type});
+                if(!person) {
+                    //delete user if unable to create personnel
+                    UserDB.findByIdAndDelete(user._id, {}, () => {
+                        return res.status(200).send({
+                            auth: true,
+                            token: null,
+                            error: {message: 'Something went wrong'}
                         });
-                    }
-                });
+                    })
+                } else {
+                    jwt.signToken({ id: user._id, level: user.level }, async (result) => {
+                        let token = null;
+                        let reset_token = await new TokenGenerator().generate();
+                        token = result;
+                        user.password = null;
+                        await Mail.newUserMail({email: req.body.email, token: reset_token}, (sent) => {
+                            res.status(200).send({ auth: true, token, person, message: 'Success'});
+                        })
+                    });
+                }
             });
 
         }else {

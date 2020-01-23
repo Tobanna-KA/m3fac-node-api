@@ -24,7 +24,7 @@ module.exports.user = {
                     let err_msg = (err.code === 11000) ? 'User with the same Email already exists' : 'Ooops something went wrong'
                     res.status(200).send({ok: false, error: {message: err_msg}, auth: true})
                 } else {
-                    if(req.body.return_det) next(user)
+                    if(req.body.return_det) return next(user)
                     let token = null
                     await jwt.signToken({ id: user._id, level: user.level }, (result) => {
                         token = result;

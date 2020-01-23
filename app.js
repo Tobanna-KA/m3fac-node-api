@@ -82,7 +82,9 @@ app.post(base_url + '/suggest/team/members', user.SUGGEST_TEAM_MEMBERS);
 app.post(base_url + '/user/profile/image', image.NEW_PROFILE_IMAGE);
 
 //records
-app.post(base_url + '/new/personnel', personnel.NEW_PERSONNEL);
+app.post(base_url + '/new/person', personnel.NEW_PERSON);
+app.post(base_url + '/get/person', personnel.GET_PERSON);
+app.post(base_url + '/get/personnel', personnel.GET_PERSONNEL);
 app.post(base_url + '/edit/personnel', personnel.EDIT_PERSONNEL);
 
 // catch 404 and forward to error handler
