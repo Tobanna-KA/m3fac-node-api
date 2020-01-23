@@ -5,10 +5,12 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 let bodyParser = require('body-parser');
-let auth = require('./app/auth/controllers').security
-let user = require('./app/user/controllers').user
-let image = require('./app/images/controllers').image
-let config = require('./config')
+let auth = require('./app/auth/controllers').security;
+let user = require('./app/user/controllers').user;
+let image = require('./app/images/controllers').image;
+let personnel = require('./app/personnel/controllers').personnel;
+let settings = require('./app/settings/controllers').settings;
+let config = require('./config');
 
 let jwt = require('./helpers/general/jwt')
 
@@ -20,7 +22,9 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 //connect to db
 // mongoose.connect(config.MONGODB_URI, {useNewUrlParser: true});
-mongoose.connect('mongodb://localhost:27017/m3fac', {useNewUrlParser: true});
+mongoose.connect('mongodb://localhost:27017/m3fac', {useNewUrlParser: true}, (err, success) => {
+  if(err) throw err
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -52,8 +56,15 @@ app.use(bodyParser.json())
 
 let base_url = '/api'
 
+//Verify that this is not first use
+// app.use( async (req, res, next) => {
+//   console.log(await settings.FIRST_USE(req, res, next));
+//   next()
+// });
+
 //auth routes
 app.post(base_url + '/auth/login', auth.LOGIN);
+app.post(base_url + '/test', settings.FIRST_USE);
 app.post(base_url + '/auth/change/password', auth.CHANGE_PASSWORD);
 app.post(base_url + '/auth/request/otp', auth.REQUEST_PASSWORD_RECOVERY);
 app.post(base_url + '/auth/complete/otp', auth.COMPLETE_PASSWORD_RECOVERY);
@@ -68,7 +79,11 @@ app.post(base_url + '/suggest/team/members', user.SUGGEST_TEAM_MEMBERS);
 
 
 //image routes
-app.post(base_url + '/user/profile/image', image.NEW_PROFILE_IMAGE)
+app.post(base_url + '/user/profile/image', image.NEW_PROFILE_IMAGE);
+
+//records
+app.post(base_url + '/new/personnel', personnel.NEW_PERSONNEL);
+app.post(base_url + '/edit/personnel', personnel.EDIT_PERSONNEL);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

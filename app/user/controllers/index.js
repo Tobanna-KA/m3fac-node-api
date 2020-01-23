@@ -5,7 +5,7 @@ let Mail = require('../../mail/controller').mail
 const TokenGenerator = require('uuid-token-generator');
 
 module.exports.user = {
-    NEW_USER: async (req, res) => {
+    NEW_USER: async (req, res, next) => {
         if (req.body.email && req.body.first_name && req.body.last_name && req.body.identification) {
             let password = (req.body.password)? req.body.password : await new TokenGenerator().generate(); // Default is a 128-bit token encoded in base58
             let reset_token = await new TokenGenerator().generate();
@@ -20,12 +20,11 @@ module.exports.user = {
             }
 
             User.create(userData, async (err, user) => {
-                console.log(err, userData)
                 if (err) {
                     let err_msg = (err.code === 11000) ? 'User with the same Email already exists' : 'Ooops something went wrong'
                     res.status(200).send({ok: false, error: {message: err_msg}, auth: true})
                 } else {
-
+                    if(req.body.return_det) next(user)
                     let token = null
                     await jwt.signToken({ id: user._id, level: user.level }, (result) => {
                         token = result;
