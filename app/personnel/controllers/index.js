@@ -51,6 +51,28 @@ module.exports.personnel = {
 
         //return error
     },
+    GET_PERSON: async (req, res) => {
+            // if(await helper.isAdmin(req.headers['authorization'], true))
+                if(req.body._id) {
+                    let person = await Personnel.findOne({_id: req.body._id})
+                        .populate({
+                            path: 'personal_det',
+                            select: '-password -resetPasswordToken'
+                        });
+                    // console.log(user)
+                    res.status(200).send({auth: true, person})
+                } else {
+                    res.status(200).send({auth: true, token: null, error: {message: 'All required fields not filled!'}});
+                }
+            // else res.send({auth: true, error: {message: "You do not have permission to make this change. This issue has been reported"}})
+    },
+    GET_PERSONNEL: async (req, res) => {
+        let personnel = await Personnel.find({}).populate({
+            path: 'personal_det',
+            select: '-password -resetPasswordToken'
+        });
+        res.status(200).send({auth: true, personnel})
+    },
     /**
      * Edits personnel details
      * @param req
