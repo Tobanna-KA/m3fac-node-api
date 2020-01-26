@@ -10,6 +10,7 @@ let user = require('./app/user/controllers').user;
 let image = require('./app/images/controllers').image;
 let personnel = require('./app/personnel/controllers').personnel;
 let settings = require('./app/settings/controllers').settings;
+let records = require('./app/records/controllers').records;
 let config = require('./config');
 
 let jwt = require('./helpers/general/jwt')
@@ -82,6 +83,14 @@ app.post(base_url + '/suggest/team/members', user.SUGGEST_TEAM_MEMBERS);
 app.post(base_url + '/user/profile/image', image.NEW_PROFILE_IMAGE);
 
 //records
+app.post(base_url + '/new/illness-or-allergy', records.illness_and_allergy.NEW);
+app.post(base_url + '/edit/illness-or-allergy', records.illness_and_allergy.EDIT);
+app.post(base_url + '/get/illness-or-allergy/by/id', records.illness_and_allergy.GET_BY_ID);
+app.post(base_url + '/get/illness-or-allergy/by/name', records.illness_and_allergy.GET_BY_NAME);
+app.post(base_url + '/get/all/illnesses-or-allergies', records.illness_and_allergy.GET_ALL);
+
+
+// person
 app.post(base_url + '/new/person', personnel.NEW_PERSON);
 app.post(base_url + '/get/person', personnel.GET_PERSON);
 app.post(base_url + '/get/personnel', personnel.GET_PERSONNEL);
